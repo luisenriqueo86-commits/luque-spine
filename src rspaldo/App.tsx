@@ -1,15 +1,27 @@
-import {
-  IonApp, IonIcon, IonLabel, IonRouterOutlet, IonTabBar,
-  IonTabButton, IonTabs, setupIonicReact
+ import {
+  IonApp,
+  IonIcon,
+  IonLabel,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+  setupIonicReact,
 } from '@ionic/react';
+
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
-import { homeOutline, peopleOutline, settingsOutline } from 'ionicons/icons';
+
+import {
+  homeOutline,
+  peopleOutline,
+  settingsOutline,
+} from 'ionicons/icons';
 
 import HomePage from './pages/HomePage';
 import PatientsPage from './pages/PatientsPage';
-import PatientFormPage from './pages/PatientFormPage';
 import SettingsPage from './pages/SettingsPage';
+import PatientFormPage from './pages/PatientFormPage';
 
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
@@ -21,8 +33,8 @@ import '@ionic/react/css/text-alignment.css';
 import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
+
 import './theme/variables.css';
-import './theme/app.css';
 
 setupIonicReact();
 
@@ -31,11 +43,27 @@ const App: React.FC = () => (
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
-          <Route exact path="/inicio"><HomePage /></Route>
-          <Route exact path="/pacientes"><PatientsPage /></Route>
-          <Route exact path="/nuevo-paciente"><PatientFormPage /></Route>
-          <Route exact path="/ajustes"><SettingsPage /></Route>
-          <Route exact path="/"><Redirect to="/inicio" /></Route>
+          <Route exact path="/inicio">
+            <HomePage />
+          </Route>
+
+          <Route exact path="/pacientes">
+            <PatientsPage  />
+          </Route>
+          <Route exact path="/nuevo-paciente">
+            <PatientFormPage />
+          </Route>
+            <Route exact path="/nuevo-paciente">
+             <PatientFormPage />
+          </Route>
+
+          <Route exact path="/ajustes">
+            <SettingsPage />
+          </Route>
+
+          <Route exact path="/">
+            <Redirect to="/inicio" />
+          </Route>
         </IonRouterOutlet>
 
         <IonTabBar slot="bottom">
@@ -43,10 +71,12 @@ const App: React.FC = () => (
             <IonIcon icon={homeOutline} />
             <IonLabel>Inicio</IonLabel>
           </IonTabButton>
+
           <IonTabButton tab="pacientes" href="/pacientes">
             <IonIcon icon={peopleOutline} />
             <IonLabel>Pacientes</IonLabel>
           </IonTabButton>
+
           <IonTabButton tab="ajustes" href="/ajustes">
             <IonIcon icon={settingsOutline} />
             <IonLabel>Ajustes</IonLabel>

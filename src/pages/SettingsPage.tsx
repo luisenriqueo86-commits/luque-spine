@@ -1,25 +1,24 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
-import './Tab3.css';
+import {
+  IonContent, IonHeader, IonItem, IonLabel, IonList,
+  IonPage, IonTitle, IonToolbar
+} from '@ionic/react';
 
- const SettingsPage: React.FC = () => {
-  return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Tab 3</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Tab 3</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <ExploreContainer name="Tab 3 page" />
-      </IonContent>
-    </IonPage>
-  );
-};
+const SettingsPage: React.FC = () => (
+  <IonPage>
+    <IonHeader>
+      <IonToolbar><IonTitle>Ajustes</IonTitle></IonToolbar>
+    </IonHeader>
+    <IonContent className="ion-padding">
+      <IonList inset>
+        <IonItem>
+          <IonLabel>
+            <h2>Luque Spine</h2>
+            <p>Versión local de desarrollo</p>
+          </IonLabel>
+        </IonItem>
+      </IonList>
+    </IonContent>
+  </IonPage>
+);
 
- export default SettingsPage;
+export default SettingsPage;

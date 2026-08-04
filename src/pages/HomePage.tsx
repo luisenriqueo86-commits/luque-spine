@@ -1,90 +1,54 @@
- import {
-  IonButton,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-} from '@ionic/react';
-
 import {
-  addCircleOutline,
-  peopleOutline,
-  analyticsOutline,
-  documentTextOutline,
+  IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle,
+  IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar
+} from '@ionic/react';
+import {
+  addCircleOutline, analyticsOutline, documentTextOutline, peopleOutline
 } from 'ionicons/icons';
-
 import { useHistory } from 'react-router-dom';
 
- const HomePage: React.FC = () => {
+const HomePage: React.FC = () => {
   const history = useHistory();
 
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
-          <IonTitle>Luque Spine</IonTitle>
-        </IonToolbar>
+        <IonToolbar><IonTitle>Luque Spine</IonTitle></IonToolbar>
       </IonHeader>
-
       <IonContent className="ion-padding">
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <h1 style={{ fontWeight: 700 }}>Luque Spine</h1>
+        <section className="hero">
+          <h1>Luque Spine</h1>
           <p>Registro clínico y seguimiento de cirugía de columna</p>
-        </div>
+        </section>
 
-        <IonButton
-          expand="block"
-          size="large"
-          onClick={() => history.push('/pacientes')}
-        >
+        <IonButton expand="block" size="large" routerLink="/nuevo-paciente">
           <IonIcon slot="start" icon={addCircleOutline} />
           Nuevo paciente
         </IonButton>
 
         <IonCard button onClick={() => history.push('/pacientes')}>
           <IonCardHeader>
-            <IonCardTitle>
-              <IonIcon icon={peopleOutline} /> Pacientes
-            </IonCardTitle>
+            <IonCardTitle><IonIcon icon={peopleOutline} /> Pacientes</IonCardTitle>
           </IonCardHeader>
-
-          <IonCardContent>
-            Consultar y administrar pacientes registrados.
-          </IonCardContent>
+          <IonCardContent>Consultar y administrar pacientes registrados.</IonCardContent>
         </IonCard>
 
         <IonCard>
           <IonCardHeader>
-            <IonCardTitle>
-              <IonIcon icon={documentTextOutline} /> Seguimientos
-            </IonCardTitle>
+            <IonCardTitle><IonIcon icon={documentTextOutline} /> Seguimientos</IonCardTitle>
           </IonCardHeader>
-
-          <IonCardContent>
-            Registrar ODI y VAS en los controles postoperatorios.
-          </IonCardContent>
+          <IonCardContent>Registrar ODI y VAS durante el seguimiento.</IonCardContent>
         </IonCard>
 
         <IonCard>
           <IonCardHeader>
-            <IonCardTitle>
-              <IonIcon icon={analyticsOutline} /> Investigación
-            </IonCardTitle>
+            <IonCardTitle><IonIcon icon={analyticsOutline} /> Investigación</IonCardTitle>
           </IonCardHeader>
-
-          <IonCardContent>
-            Organizar pacientes por proyectos y analizar resultados.
-          </IonCardContent>
+          <IonCardContent>Organizar pacientes por proyectos y analizar resultados.</IonCardContent>
         </IonCard>
       </IonContent>
     </IonPage>
   );
 };
 
- export default HomePage;
+export default HomePage;

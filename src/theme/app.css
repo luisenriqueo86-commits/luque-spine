@@ -1,0 +1,31 @@
+.hero {
+  text-align: center;
+  margin: 18px 0 24px;
+}
+
+.hero h1 {
+  margin-bottom: 8px;
+  font-size: 2rem;
+  font-weight: 750;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--ion-color-medium);
+}
+
+.section-title {
+  margin: 24px 4px 10px;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 48px;
+  opacity: 0.72;
+}
+
+.empty-state__icon {
+  font-size: 72px;
+}
