@@ -47,7 +47,7 @@ const PatientsPage: React.FC = () => {
         ) : (
           <IonList>
             {pacientesFiltrados.map((paciente) => (
-              <IonItem key={paciente.id} button detail>
+              <IonItem key={paciente.id} button detail routerLink={`/pacientes/${paciente.id}`}>
                 <IonIcon slot="start" icon={personCircleOutline} />
                 <IonLabel>
                   <h2>{paciente.nombre}</h2>

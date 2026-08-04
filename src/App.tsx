@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage';
 import PatientsPage from './pages/PatientsPage';
 import PatientFormPage from './pages/PatientFormPage';
 import SettingsPage from './pages/SettingsPage';
+import PatientDetailPage from './pages/PatientDetailPage';
 
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
@@ -34,6 +35,7 @@ const App: React.FC = () => (
           <Route exact path="/inicio"><HomePage /></Route>
           <Route exact path="/pacientes"><PatientsPage /></Route>
           <Route exact path="/nuevo-paciente"><PatientFormPage /></Route>
+          <Route exact path="/pacientes/:id"><PatientDetailPage /></Route>
           <Route exact path="/ajustes"><SettingsPage /></Route>
           <Route exact path="/"><Redirect to="/inicio" /></Route>
         </IonRouterOutlet>
