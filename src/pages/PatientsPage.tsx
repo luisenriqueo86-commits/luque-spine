@@ -10,6 +10,7 @@
   IonSearchbar,
   IonTitle,
   IonToolbar,
+  useIonViewWillEnter,
 } from '@ionic/react';
 
 import {
@@ -20,16 +21,27 @@ import {
 import { useState } from 'react';
 
 interface Paciente {
-  id: number;
+  id: string;
   nombre: string;
-  edad: number;
+  edad: string;
   diagnostico: string;
 }
 
- const PatientsPage: React.FC = () => {
+const PatientsPage: React.FC = () => {
   const [busqueda, setBusqueda] = useState('');
+  const [pacientes, setPacientes] = useState<Paciente[]>([]);
 
-  const pacientes: Paciente[] = [];
+  const cargarPacientes = () => {
+    const guardados = JSON.parse(
+      localStorage.getItem('luqueSpinePacientes') ?? '[]'
+    );
+
+    setPacientes(guardados);
+  };
+
+  useIonViewWillEnter(() => {
+    cargarPacientes();
+  });
 
   const pacientesFiltrados = pacientes.filter((paciente) =>
     paciente.nombre.toLowerCase().includes(busqueda.toLowerCase())
@@ -44,7 +56,11 @@ interface Paciente {
       </IonHeader>
 
       <IonContent className="ion-padding">
-        <IonButton expand="block" size="large">
+        <IonButton
+          expand="block"
+          size="large"
+          routerLink="/nuevo-paciente"
+        >
           <IonIcon slot="start" icon={addCircleOutline} />
           Nuevo paciente
         </IonButton>
@@ -88,7 +104,11 @@ interface Paciente {
                 <IonLabel>
                   <h2>{paciente.nombre}</h2>
                   <p>
-                    {paciente.edad} años · {paciente.diagnostico}
+                    {paciente.edad
+                      ? `${paciente.edad} años`
+                      : 'Edad no registrada'}
+                    {' · '}
+                    {paciente.diagnostico || 'Sin diagnóstico'}
                   </p>
                 </IonLabel>
               </IonItem>
@@ -100,4 +120,4 @@ interface Paciente {
   );
 };
 
- export default PatientsPage;
+export default PatientsPage;
