@@ -1,4 +1,4 @@
-import {
+ import {
   IonBackButton,
   IonButtons,
   IonCard,
@@ -38,8 +38,7 @@ const PatientDetailPage: React.FC = () => {
   const { id } = useParams<RouteParams>();
 
   const [paciente, setPaciente] = useState<Patient | null>(null);
-  const [seccion, setSeccion] =
-    useState<PatientSection>('datos');
+  const [seccion, setSeccion] = useState<PatientSection>('datos');
 
   useEffect(() => {
     const encontrado = getPatients().find(
@@ -82,13 +81,12 @@ const PatientDetailPage: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding">
+
         <IonSegment
           scrollable
           value={seccion}
           onIonChange={(event) =>
-            setSeccion(
-              event.detail.value as PatientSection
-            )
+            setSeccion(event.detail.value as PatientSection)
           }
         >
           <IonSegmentButton value="datos">
@@ -120,6 +118,7 @@ const PatientDetailPage: React.FC = () => {
 
             <IonCardContent>
               <IonList>
+
                 <IonItem>
                   <IonLabel>
                     <h3>Nombre</h3>
@@ -141,7 +140,9 @@ const PatientDetailPage: React.FC = () => {
                 <IonItem>
                   <IonLabel>
                     <h3>Sexo</h3>
-                    <p>{paciente.sexo || 'No registrado'}</p>
+                    <p>
+                      {paciente.sexo || 'No registrado'}
+                    </p>
                   </IonLabel>
                 </IonItem>
 
@@ -167,9 +168,12 @@ const PatientDetailPage: React.FC = () => {
                 <IonItem>
                   <IonLabel>
                     <h3>Seguro médico / OS</h3>
-                    <p>{paciente.seguro || 'No registrado'}</p>
+                    <p>
+                      {paciente.seguro || 'No registrado'}
+                    </p>
                   </IonLabel>
                 </IonItem>
+
               </IonList>
             </IonCardContent>
           </IonCard>
@@ -185,24 +189,31 @@ const PatientDetailPage: React.FC = () => {
 
             <IonCardContent>
               <IonList>
+
                 <IonItem>
                   <IonLabel className="ion-text-wrap">
                     <h3>Clínica</h3>
-                    <p>{paciente.clinica || 'No registrada'}</p>
+                    <p>
+                      {paciente.clinica || 'No registrada'}
+                    </p>
                   </IonLabel>
                 </IonItem>
 
                 <IonItem>
                   <IonLabel className="ion-text-wrap">
                     <h3>TAC</h3>
-                    <p>{paciente.tac || 'No registrada'}</p>
+                    <p>
+                      {paciente.tac || 'No registrada'}
+                    </p>
                   </IonLabel>
                 </IonItem>
 
                 <IonItem>
                   <IonLabel className="ion-text-wrap">
                     <h3>RMN</h3>
-                    <p>{paciente.rmn || 'No registrada'}</p>
+                    <p>
+                      {paciente.rmn || 'No registrada'}
+                    </p>
                   </IonLabel>
                 </IonItem>
 
@@ -215,6 +226,7 @@ const PatientDetailPage: React.FC = () => {
                     </p>
                   </IonLabel>
                 </IonItem>
+
               </IonList>
             </IonCardContent>
           </IonCard>
@@ -228,6 +240,7 @@ const PatientDetailPage: React.FC = () => {
 
             <IonCardContent>
               <IonList>
+
                 <IonItem>
                   <IonLabel>
                     <h3>Fecha</h3>
@@ -241,16 +254,21 @@ const PatientDetailPage: React.FC = () => {
                 <IonItem>
                   <IonLabel>
                     <h3>Técnica</h3>
-                    <p>{paciente.tecnica || 'No registrada'}</p>
+                    <p>
+                      {paciente.tecnica || 'No registrada'}
+                    </p>
                   </IonLabel>
                 </IonItem>
 
                 <IonItem>
                   <IonLabel>
                     <h3>Niveles</h3>
-                    <p>{paciente.niveles || 'No registrados'}</p>
+                    <p>
+                      {paciente.niveles || 'No registrados'}
+                    </p>
                   </IonLabel>
                 </IonItem>
+
               </IonList>
             </IonCardContent>
           </IonCard>
@@ -279,6 +297,7 @@ const PatientDetailPage: React.FC = () => {
             </IonCardContent>
           </IonCard>
         )}
+
       </IonContent>
     </IonPage>
   );
