@@ -1,4 +1,8 @@
- export type PatientSex = 'masculino' | 'femenino' | 'otro' | '';
+ export type PatientSex =
+  | 'masculino'
+  | 'femenino'
+  | 'otro'
+  | '';
 
 export type FollowUpMoment =
   | 'preoperatorio'
@@ -8,9 +12,30 @@ export type FollowUpMoment =
   | '6_meses'
   | '12_meses';
 
+export type ODIAnswer = number | null;
+
+export type ODIAnswers = [
+  ODIAnswer,
+  ODIAnswer,
+  ODIAnswer,
+  ODIAnswer,
+  ODIAnswer,
+  ODIAnswer,
+  ODIAnswer,
+  ODIAnswer,
+  ODIAnswer,
+  ODIAnswer
+];
+
 export interface ScaleResult {
   vas: number | null;
+
+  // Resultado final del ODI expresado en porcentaje.
   odi: number | null;
+
+  // Respuestas de las 10 secciones del ODI.
+  // Cada sección se puntúa de 0 a 5.
+  odiRespuestas: ODIAnswers;
 }
 
 export interface PatientScales {
@@ -48,18 +73,32 @@ export type PatientDraft = Omit<
   'id' | 'createdAt' | 'updatedAt'
 >;
 
-export const emptyScaleResult: ScaleResult = {
+export const emptyODIAnswers = (): ODIAnswers => [
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+];
+
+export const createEmptyScaleResult = (): ScaleResult => ({
   vas: null,
   odi: null,
-};
+  odiRespuestas: emptyODIAnswers(),
+});
 
 export const emptyPatientScales: PatientScales = {
-  preoperatorio: { ...emptyScaleResult },
-  alta: { ...emptyScaleResult },
-  '1_mes': { ...emptyScaleResult },
-  '3_meses': { ...emptyScaleResult },
-  '6_meses': { ...emptyScaleResult },
-  '12_meses': { ...emptyScaleResult },
+  preoperatorio: createEmptyScaleResult(),
+  alta: createEmptyScaleResult(),
+  '1_mes': createEmptyScaleResult(),
+  '3_meses': createEmptyScaleResult(),
+  '6_meses': createEmptyScaleResult(),
+  '12_meses': createEmptyScaleResult(),
 };
 
 export const emptyPatientDraft: PatientDraft = {
@@ -77,12 +116,13 @@ export const emptyPatientDraft: PatientDraft = {
   fechaCirugia: '',
   tecnica: '',
   niveles: '',
+
   escalas: {
-    preoperatorio: { ...emptyScaleResult },
-    alta: { ...emptyScaleResult },
-    '1_mes': { ...emptyScaleResult },
-    '3_meses': { ...emptyScaleResult },
-    '6_meses': { ...emptyScaleResult },
-    '12_meses': { ...emptyScaleResult },
+    preoperatorio: createEmptyScaleResult(),
+    alta: createEmptyScaleResult(),
+    '1_mes': createEmptyScaleResult(),
+    '3_meses': createEmptyScaleResult(),
+    '6_meses': createEmptyScaleResult(),
+    '12_meses': createEmptyScaleResult(),
   },
 };
