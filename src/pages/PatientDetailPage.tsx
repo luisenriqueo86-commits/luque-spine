@@ -24,6 +24,28 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 import {
   FollowUpMoment,
@@ -169,6 +191,7 @@ const cambiarODI = (
   };
 
   if (!paciente || !escalas) {
+    
     return (
       <IonPage>
         <IonHeader>
@@ -187,7 +210,63 @@ const cambiarODI = (
       </IonPage>
     );
   }
+const etiquetasSeguimiento = momentos.map(
+  (momento) => momento.label
+);
 
+const datosVAS = {
+  labels: etiquetasSeguimiento,
+  datasets: [
+    {
+      label: 'VAS',
+      data: momentos.map(
+         (momento) => escalas?.[momento.key].vas ?? null
+      ),
+      tension: 0.3,
+      spanGaps: false,
+    },
+  ],
+};
+
+const datosODI = {
+  labels: etiquetasSeguimiento,
+  datasets: [
+    {
+      label: 'ODI (%)',
+      data: momentos.map(
+         (momento) => escalas?.[momento.key].odi ?? null
+      ),
+      tension: 0.3,
+      spanGaps: false,
+    },
+  ],
+};
+
+const opcionesVAS = {
+  responsive: true,
+  scales: {
+    y: {
+      min: 0,
+      max: 10,
+      ticks: {
+        stepSize: 1,
+      },
+    },
+  },
+};
+
+const opcionesODI = {
+  responsive: true,
+  scales: {
+    y: {
+      min: 0,
+      max: 100,
+      ticks: {
+        stepSize: 20,
+      },
+    },
+  },
+};
   return (
     <IonPage>
       <IonHeader>
@@ -624,20 +703,87 @@ const cambiarODI = (
           </>
         )}
 
-        {seccion === 'seguimiento' && (
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle>
-                Seguimiento
-              </IonCardTitle>
-            </IonCardHeader>
+         {seccion === 'seguimiento' && (
+  <IonCard>
+    <IonCardHeader>
+      <IonCardTitle>
+        Evolución clínica
+      </IonCardTitle>
+    </IonCardHeader>
 
-            <IonCardContent>
-              Aquí registraremos alta, 1, 3, 6 y
-              12 meses.
-            </IonCardContent>
-          </IonCard>
-        )}
+    <IonCardContent>
+      <p>
+        Resumen longitudinal de VAS y ODI.
+      </p>
+
+      <IonList>
+        {momentos.map((momento) => {
+          const resultado = escalas[momento.key];
+
+          return (
+            <IonItem key={momento.key}>
+              <IonLabel className="ion-text-wrap">
+                <h2>{momento.label}</h2>
+
+                <p>
+                  VAS:{' '}
+                  <strong>
+                    {resultado.vas !== null
+                      ? `${resultado.vas}/10`
+                      : 'Sin registrar'}
+                  </strong>
+                </p>
+
+                <p>
+                  ODI:{' '}
+                  <strong>
+                    {resultado.odi !== null
+                      ? `${resultado.odi}%`
+                      : 'Sin registrar'}
+                  </strong>
+                </p>
+              </IonLabel>
+            </IonItem>
+          );
+        })}
+      </IonList>
+      <h2 className="ion-margin-top">
+  Evolución VAS
+</h2>
+
+  <div
+  style={{
+    width: '100%',
+     maxWidth: '1200px',
+     height: '380px',
+    margin: '0 auto 32px auto',
+  }}
+>
+  <Line
+    data={datosVAS}
+    options={opcionesVAS}
+  />
+</div>
+<h2 className="ion-margin-top">
+  Evolución ODI
+</h2>
+
+  <div
+  style={{
+    width: '100%',
+    maxWidth: '1200px',
+    height: '380px',
+    margin: '0 auto 32px auto',
+  }}
+>
+  <Line
+    data={datosODI}
+    options={opcionesODI}
+  />
+</div>
+    </IonCardContent>
+  </IonCard>
+)}
 
         <IonToast
           isOpen={mostrarToast}
