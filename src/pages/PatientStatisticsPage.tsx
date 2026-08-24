@@ -15,6 +15,7 @@ IonSelect,
 IonSelectOption,
 IonItem,
 IonLabel,
+IonProgressBar,
  
 
 } from '@ionic/react';
@@ -287,6 +288,15 @@ const cumplimientoSeguimiento = seguimientoEsperado.map(
           : '—',
     };
   }
+);
+const seguimientosPendientes = cumplimientoSeguimiento.map(
+  (seguimiento) => ({
+    momento: seguimiento.momento,
+    pendientes: Math.max(
+      seguimiento.esperados - seguimiento.realizados,
+      0
+    ),
+  })
 );
  
  const vasPreoperatorio = promediosSeguimiento[0]?.vas;
@@ -820,11 +830,22 @@ const opcionesODI = {
       Realizados: {resultado.realizados}
     </span>
 
-    <span>
-      Cumplimiento: {resultado.porcentaje}
-      {resultado.porcentaje !== '—' ? '%' : ''}
-    </span>
-  </div>
+     <div>
+  <span>
+    Cumplimiento: {resultado.porcentaje}
+    {resultado.porcentaje !== '—' ? '%' : ''}
+  </span>
+
+  {resultado.porcentaje !== '—' && (
+    <IonProgressBar
+      value={Number(resultado.porcentaje) / 100}
+      style={{ marginTop: '6px' }}
+    />
+  )}
+ </div>
+
+</div>
+
 ))}
 
       </IonCardContent>
