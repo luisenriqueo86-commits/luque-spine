@@ -217,6 +217,78 @@ const porcentajeSeguimiento = promediosSeguimiento.map(
     };
   }
 );
+ const fechaActual = new Date();
+
+ 
+
+const mesesDesdeCirugia = (fechaCirugia?: string) => {
+  if (!fechaCirugia) {
+    return null;
+  }
+
+  const fecha = new Date(`${fechaCirugia}T00:00:00`);
+
+  if (Number.isNaN(fecha.getTime())) {
+    return null;
+  }
+
+  const meses =
+  (fechaActual.getFullYear() - fecha.getFullYear()) * 12 +
+  (fechaActual.getMonth() - fecha.getMonth());
+
+  return meses;
+};
+const seguimientoEsperado = [
+  { nombre: '1 mes', meses: 1 },
+  { nombre: '3 meses', meses: 3 },
+  { nombre: '6 meses', meses: 6 },
+  { nombre: '12 meses', meses: 12 },
+].map((seguimiento) => {
+  const pacientesEsperados = pacientesFiltrados.filter(
+    (paciente) => {
+      const meses = mesesDesdeCirugia(
+        paciente.fechaCirugia
+      );
+
+      return (
+        meses !== null &&
+        meses >= seguimiento.meses
+      );
+    }
+  ).length;
+
+  return {
+    momento: seguimiento.nombre,
+    esperados: pacientesEsperados,
+  };
+});
+const cumplimientoSeguimiento = seguimientoEsperado.map(
+  (seguimiento) => {
+    const resultado = promediosSeguimiento.find(
+      (item) => item.momento === seguimiento.momento
+    );
+
+    const realizados = resultado
+      ? Math.max(resultado.nVAS, resultado.nODI)
+      : 0;
+
+    const porcentaje =
+      seguimiento.esperados > 0
+        ? (realizados / seguimiento.esperados) * 100
+        : null;
+
+    return {
+      momento: seguimiento.momento,
+      esperados: seguimiento.esperados,
+      realizados,
+      porcentaje:
+        porcentaje !== null
+          ? porcentaje.toFixed(1)
+          : '—',
+    };
+  }
+);
+ 
  const vasPreoperatorio = promediosSeguimiento[0]?.vas;
 
 const mejoriaVAS = promediosSeguimiento.map((resultado) => {
@@ -723,7 +795,37 @@ const opcionesODI = {
   </div>
 
 ))}
- 
+ <hr style={{ margin: '20px 0' }} />
+
+<h3>Cumplimiento del seguimiento</h3>
+
+{cumplimientoSeguimiento.map((resultado) => (
+  <div
+    key={resultado.momento}
+    style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr 1fr 1fr',
+      gap: '10px',
+      padding: '8px 0',
+      borderBottom: '1px solid #ddd',
+    }}
+  >
+    <strong>{resultado.momento}</strong>
+
+    <span>
+      Esperados: {resultado.esperados}
+    </span>
+
+    <span>
+      Realizados: {resultado.realizados}
+    </span>
+
+    <span>
+      Cumplimiento: {resultado.porcentaje}
+      {resultado.porcentaje !== '—' ? '%' : ''}
+    </span>
+  </div>
+))}
 
       </IonCardContent>
 
