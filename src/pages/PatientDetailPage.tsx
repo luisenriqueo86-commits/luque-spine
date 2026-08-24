@@ -1,4 +1,5 @@
  import {
+  IonAlert,
   IonBackButton,
   IonSelect,
   IonSelectOption,
@@ -20,10 +21,12 @@
   IonTitle,
   IonToast,
   IonToolbar,
+  useIonViewWillEnter,
 } from '@ionic/react';
 
-import { useEffect, useState } from 'react';
+ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { jsPDF } from 'jspdf';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -53,7 +56,8 @@ import {
   PatientScales,
 } from '../models/patient';
 
-import {
+ import {
+  deletePatient,
   getPatients,
   updatePatientScales,
 } from '../services/patientStorage';
@@ -105,22 +109,25 @@ const PatientDetailPage: React.FC = () => {
     useState<PatientScales | null>(null);
 
   const [mostrarToast, setMostrarToast] =
-    useState(false);
-  const [momentoODI, setMomentoODI] =
-   useState<FollowUpMoment>('preoperatorio');
+  useState(false);
 
-    useEffect(() => {
-    const encontrado = getPatients().find(
-      (item) => item.id === id
-    );
+const [mostrarEliminar, setMostrarEliminar] =
+  useState(false);
 
-    setPaciente(encontrado ?? null);
+const [momentoODI, setMomentoODI] =
+  useState<FollowUpMoment>('preoperatorio');
 
-    if (encontrado) {
-      setEscalas(encontrado.escalas);
-    }
-  }, [id]);
+     useIonViewWillEnter(() => {
+  const encontrado = getPatients().find(
+    (item) => item.id === id
+  );
 
+  setPaciente(encontrado ?? null);
+
+  if (encontrado) {
+    setEscalas(encontrado.escalas);
+  }
+});
   const cambiarVAS = (
     momento: FollowUpMoment,
     valor: number
@@ -174,7 +181,301 @@ const cambiarODI = (
     },
     });
     };
+   const exportarPDF = (anonimizado = false) => {
+  if (!paciente || !escalas) return;
 
+  const pdf = new jsPDF();
+
+  const anchoPagina = pdf.internal.pageSize.getWidth();
+  const margen = 18;
+  const anchoContenido = anchoPagina - margen * 2;
+
+  let y = 18;
+
+  const ocultarIdentidad =
+  anonimizado || paciente.ocultarNombre;
+
+const nombrePaciente = ocultarIdentidad
+  ? `Paciente ${paciente.id.slice(0, 8)}`
+  : paciente.nombre || 'Sin nombre';
+
+  const comprobarPagina = (alturaNecesaria = 10) => {
+    if (y + alturaNecesaria > 280) {
+      pdf.addPage();
+      y = 20;
+    }
+  };
+
+  const tituloSeccion = (titulo: string) => {
+    comprobarPagina(18);
+
+    y += 5;
+
+    pdf.setFillColor(235, 240, 245);
+    pdf.roundedRect(
+      margen,
+      y,
+      anchoContenido,
+      10,
+      2,
+      2,
+      'F'
+    );
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(12);
+    pdf.text(titulo, margen + 4, y + 7);
+
+    pdf.setFont('helvetica', 'normal');
+
+    y += 16;
+  };
+
+  const campo = (
+    etiqueta: string,
+    valor: string
+  ) => {
+    comprobarPagina(12);
+
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+
+    pdf.text(`${etiqueta}:`, margen, y);
+
+    pdf.setFont('helvetica', 'normal');
+
+    const texto = pdf.splitTextToSize(
+      valor || 'No registrado',
+      anchoContenido - 40
+    );
+
+    pdf.text(texto, margen + 40, y);
+
+    y += Math.max(7, texto.length * 5);
+  };
+
+  // CABECERA
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(20);
+
+  pdf.text(
+    'LUQUE SPINE',
+    anchoPagina / 2,
+    y,
+    { align: 'center' }
+  );
+
+  y += 8;
+
+  pdf.setFontSize(11);
+  pdf.setFont('helvetica', 'normal');
+
+  pdf.text(
+    'Ficha clínica y seguimiento de columna',
+    anchoPagina / 2,
+    y,
+    { align: 'center' }
+  );
+
+  y += 6;
+
+  pdf.setDrawColor(120);
+  pdf.line(
+    margen,
+    y,
+    anchoPagina - margen,
+    y
+  );
+
+  y += 10;
+
+  // DATOS PERSONALES
+  tituloSeccion('DATOS DEL PACIENTE');
+
+  campo('Paciente', nombrePaciente);
+  campo(
+    'Edad',
+    paciente.edad
+      ? `${paciente.edad} años`
+      : 'No registrada'
+  );
+
+  campo(
+    'Sexo',
+    paciente.sexo || 'No registrado'
+  );
+
+  if (!ocultarIdentidad) {
+    campo(
+      'Teléfono',
+      paciente.telefono || 'No registrado'
+    );
+  }
+
+   if (!ocultarIdentidad) {
+  campo(
+    'Historia clínica',
+    paciente.historiaClinica ||
+      'No registrada'
+  );
+
+  campo(
+    'Seguro / OS',
+    paciente.seguro || 'No registrado'
+  );
+}
+
+  // DIAGNÓSTICO
+  tituloSeccion('CLÍNICA Y DIAGNÓSTICO');
+
+  campo(
+    'Clínica',
+    paciente.clinica || 'No registrada'
+  );
+
+  campo(
+    'TAC',
+    paciente.tac || 'No registrada'
+  );
+
+  campo(
+    'RMN',
+    paciente.rmn || 'No registrada'
+  );
+
+  campo(
+    'Diagnóstico',
+    paciente.diagnostico ||
+      'No registrado'
+  );
+
+  // CIRUGÍA
+  tituloSeccion('CIRUGÍA');
+
+  campo(
+    'Fecha',
+    paciente.fechaCirugia ||
+      'No registrada'
+  );
+
+  campo(
+    'Técnica',
+    paciente.tecnica ||
+      'No registrada'
+  );
+
+  campo(
+    'Niveles',
+    paciente.niveles ||
+      'No registrados'
+  );
+
+  // EVOLUCIÓN
+  tituloSeccion('EVOLUCIÓN VAS / ODI');
+
+  comprobarPagina(15);
+
+  const xMomento = margen;
+  const xVAS = 105;
+  const xODI = 145;
+
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(10);
+
+  pdf.text('Control', xMomento, y);
+  pdf.text('VAS', xVAS, y);
+  pdf.text('ODI', xODI, y);
+
+  y += 3;
+
+  pdf.line(
+    margen,
+    y,
+    anchoPagina - margen,
+    y
+  );
+
+  y += 7;
+
+  pdf.setFont('helvetica', 'normal');
+
+  momentos.forEach((momento) => {
+    comprobarPagina(10);
+
+    const resultado =
+      escalas[momento.key];
+
+    const vas =
+      resultado.vas !== null
+        ? `${resultado.vas}/10`
+        : '-';
+
+    const odi =
+      resultado.odi !== null
+        ? `${resultado.odi}%`
+        : '-';
+
+    pdf.text(
+      momento.label,
+      xMomento,
+      y
+    );
+
+    pdf.text(
+      vas,
+      xVAS,
+      y
+    );
+
+    pdf.text(
+      odi,
+      xODI,
+      y
+    );
+
+    y += 8;
+  });
+
+  // PIE
+  y += 8;
+
+  comprobarPagina(20);
+
+  pdf.setDrawColor(180);
+
+  pdf.line(
+    margen,
+    y,
+    anchoPagina - margen,
+    y
+  );
+
+  y += 7;
+
+  pdf.setFontSize(8);
+
+  pdf.text(
+    `Generado por Luque Spine · ${new Date().toLocaleDateString()}`,
+    margen,
+    y
+  );
+
+  pdf.text(
+    `HC: ${paciente.historiaClinica || '-'}`,
+    anchoPagina - margen,
+    y,
+    { align: 'right' }
+  );
+
+  const nombreArchivo =
+    paciente.ocultarNombre
+      ? `luque-spine-paciente-${paciente.id}.pdf`
+      : `luque-spine-${paciente.nombre
+          .replace(/\s+/g, '-')
+          .toLowerCase()}.pdf`;
+
+  pdf.save(nombreArchivo);
+};
   const guardarEscalas = () => {
     if (!paciente || !escalas) return;
 
@@ -203,10 +504,6 @@ const cambiarODI = (
             <IonTitle>Paciente</IonTitle>
           </IonToolbar>
         </IonHeader>
-
-        <IonContent className="ion-padding">
-          <h2>Paciente no encontrado</h2>
-        </IonContent>
       </IonPage>
     );
   }
@@ -279,8 +576,42 @@ const opcionesODI = {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent className="ion-padding">
+ <IonContent className="ion-padding">
 
+  <IonButton
+    expand="block"
+    className="ion-margin-bottom"
+    onClick={() => exportarPDF(false)}
+  >
+    PDF clínico
+  </IonButton>
+
+  <IonButton
+    expand="block"
+    fill="outline"
+    className="ion-margin-bottom"
+    onClick={() => exportarPDF(true)}
+  >
+    PDF anonimizado para investigación
+  </IonButton>
+
+  <IonButton
+    expand="block"
+    fill="outline"
+    className="ion-margin-bottom"
+    routerLink={`/pacientes/${paciente.id}/editar`}
+  >
+    Editar paciente
+  </IonButton>
+  <IonButton
+  expand="block"
+  color="danger"
+  fill="outline"
+  className="ion-margin-bottom"
+  onClick={() => setMostrarEliminar(true)}
+>
+  Eliminar paciente
+</IonButton>
         <IonSegment
           scrollable
           value={seccion}
@@ -793,8 +1124,31 @@ const opcionesODI = {
             setMostrarToast(false)
           }
         />
-
-      </IonContent>
+<IonAlert
+  isOpen={mostrarEliminar}
+  header="Eliminar paciente"
+  message="¿Está seguro de que desea eliminar este paciente? Esta acción no se puede deshacer."
+  buttons={[
+    {
+      text: 'Cancelar',
+      role: 'cancel',
+      handler: () => {
+        setMostrarEliminar(false);
+      },
+    },
+    {
+      text: 'Eliminar',
+      role: 'destructive',
+      handler: () => {
+        deletePatient(paciente.id);
+        setMostrarEliminar(false);
+        window.location.href = '/pacientes';
+      },
+    },
+  ]}
+  onDidDismiss={() => setMostrarEliminar(false)}
+/>
+     </IonContent>
     </IonPage>
   );
 };

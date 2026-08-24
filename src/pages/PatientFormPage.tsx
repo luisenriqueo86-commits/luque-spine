@@ -3,36 +3,86 @@ import {
   IonLabel, IonList, IonPage, IonSelect, IonSelectOption, IonTextarea,
   IonTitle, IonToast, IonToolbar
 } from '@ionic/react';
-import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+ import { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 
 import SectionTitle from '../components/SectionTitle';
 import { emptyPatientDraft, PatientDraft } from '../models/patient';
-import { createPatient } from '../services/patientStorage';
+ import {
+  createPatient,
+  getPatients,
+  updatePatient,
+} from '../services/patientStorage';
 
 const PatientFormPage: React.FC = () => {
   const history = useHistory();
+    const { id } = useParams<{ id?: string }>();
+  const modoEdicion = Boolean(id);
   const [paciente, setPaciente] = useState<PatientDraft>(emptyPatientDraft);
   const [mostrarAviso, setMostrarAviso] = useState(false);
+  useEffect(() => {
+  if (!id) return;
+
+  const pacienteExistente = getPatients().find(
+    (item) => item.id === id
+  );
+
+  if (!pacienteExistente) return;
+
+  const {
+    id: _id,
+    createdAt: _createdAt,
+    updatedAt: _updatedAt,
+    ...datosPaciente
+  } = pacienteExistente;
+
+  setPaciente(datosPaciente);
+}, [id]);
 
   const actualizarCampo = <K extends keyof PatientDraft>(
     campo: K,
     valor: PatientDraft[K]
   ) => setPaciente((anterior) => ({ ...anterior, [campo]: valor }));
 
-  const guardarPaciente = () => {
-    if (!paciente.nombre.trim()) {
-      setMostrarAviso(true);
+ const guardarPaciente = () => {
+  if (!paciente.nombre.trim()) {
+    setMostrarAviso(true);
+    return;
+  }
+
+  if (modoEdicion && id) {
+    const pacienteExistente = getPatients().find(
+      (item) => item.id === id
+    );
+
+    if (!pacienteExistente) {
       return;
     }
-    createPatient(paciente);
-    history.replace('/pacientes');
-  };
+
+    updatePatient({
+      ...pacienteExistente,
+      ...paciente,
+      id: pacienteExistente.id,
+      createdAt: pacienteExistente.createdAt,
+      updatedAt: pacienteExistente.updatedAt,
+    });
+
+    history.replace(`/pacientes/${id}`);
+    return;
+  }
+
+  createPatient(paciente);
+  history.replace('/pacientes');
+};
 
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar><IonTitle>Nuevo paciente</IonTitle></IonToolbar>
+        <IonToolbar>
+  <IonTitle>
+    {modoEdicion ? 'Editar paciente' : 'Nuevo paciente'}
+  </IonTitle>
+</IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
         <SectionTitle>Datos personales</SectionTitle>
@@ -182,9 +232,15 @@ const PatientFormPage: React.FC = () => {
           </IonItem>
         </IonList>
 
-        <IonButton expand="block" size="large" onClick={guardarPaciente}>
-          Guardar paciente
-        </IonButton>
+        <IonButton
+  expand="block"
+  size="large"
+  onClick={guardarPaciente}
+>
+  {modoEdicion
+    ? 'Guardar cambios'
+    : 'Guardar paciente'}
+</IonButton>
 
         <IonToast
           isOpen={mostrarAviso}

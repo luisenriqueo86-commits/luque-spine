@@ -40,12 +40,20 @@ const HomePage: React.FC = () => {
           <IonCardContent>Registrar ODI y VAS durante el seguimiento.</IonCardContent>
         </IonCard>
 
-        <IonCard>
-          <IonCardHeader>
-            <IonCardTitle><IonIcon icon={analyticsOutline} /> Investigación</IonCardTitle>
-          </IonCardHeader>
-          <IonCardContent>Organizar pacientes por proyectos y analizar resultados.</IonCardContent>
-        </IonCard>
+         <IonCard
+  button
+  onClick={() => history.push('/investigacion')}
+>
+  <IonCardHeader>
+    <IonCardTitle>
+      <IonIcon icon={analyticsOutline} /> Investigación
+    </IonCardTitle>
+  </IonCardHeader>
+
+  <IonCardContent>
+    Organizar pacientes por proyectos y analizar resultados.
+  </IonCardContent>
+  </IonCard>
       </IonContent>
     </IonPage>
   );

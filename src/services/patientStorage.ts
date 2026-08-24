@@ -5,6 +5,7 @@
   ScaleResult,
   emptyODIAnswers,
 } from '../models/patient';
+ 
 
 const STORAGE_KEY = 'luqueSpinePacientes';
 
@@ -138,4 +139,42 @@ export const updatePatientScales = (
     ...patient,
     escalas,
   });
+};
+ export const deletePatient = (
+  patientId: string
+): void => {
+  const patients = getPatients().filter(
+    (patient) => patient.id !== patientId
+  );
+
+  savePatients(patients);
+
+  const rawProjects = localStorage.getItem(
+    'luqueSpineResearchProjects'
+  );
+
+  if (!rawProjects) return;
+
+  try {
+    const projects = JSON.parse(rawProjects);
+
+    const updatedProjects = projects.map(
+      (project: any) => ({
+        ...project,
+        patientIds: Array.isArray(project.patientIds)
+          ? project.patientIds.filter(
+              (id: string) => id !== patientId
+            )
+          : [],
+      })
+    );
+
+    localStorage.setItem(
+      'luqueSpineResearchProjects',
+      JSON.stringify(updatedProjects)
+    );
+  } catch {
+    // Si los proyectos no pueden leerse,
+    // no bloqueamos la eliminación del paciente.
+  }
 };
