@@ -29,6 +29,27 @@ import {
   getResearchProjects,
   updateResearchProject,
 } from '../services/researchProjectStorage';
+import { Line } from 'react-chartjs-2';
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface RouteParams {
   id: string;
@@ -114,6 +135,150 @@ const ResearchProjectDetailPage: React.FC = () => {
     (patient) =>
       project.patientIds.includes(patient.id)
   );
+  const edadesValidasProyecto = pacientesIncluidos
+  .map((patient) => Number(patient.edad))
+  .filter(
+    (edad) =>
+      !Number.isNaN(edad) &&
+      edad > 0
+  );
+
+const edadPromedioProyecto =
+  edadesValidasProyecto.length > 0
+    ? (
+        edadesValidasProyecto.reduce(
+          (suma, edad) => suma + edad,
+          0
+        ) / edadesValidasProyecto.length
+      ).toFixed(1)
+    : '—';
+
+const vasPreoperatorios = pacientesIncluidos
+  .map(
+    (patient) =>
+      patient.escalas.preoperatorio.vas
+  )
+  .filter(
+    (valor): valor is number =>
+      typeof valor === 'number'
+  );
+
+const vasPreoperatorioPromedio =
+  vasPreoperatorios.length > 0
+    ? (
+        vasPreoperatorios.reduce(
+          (suma, valor) => suma + valor,
+          0
+        ) / vasPreoperatorios.length
+      ).toFixed(1)
+    : '—';
+
+const odiPreoperatorios = pacientesIncluidos
+  .map(
+    (patient) =>
+      patient.escalas.preoperatorio.odi
+  )
+  .filter(
+    (valor): valor is number =>
+      typeof valor === 'number'
+  );
+
+const odiPreoperatorioPromedio =
+  odiPreoperatorios.length > 0
+    ? (
+        odiPreoperatorios.reduce(
+          (suma, valor) => suma + valor,
+          0
+        ) / odiPreoperatorios.length
+      ).toFixed(1)
+    : '—';
+    const momentosProyecto = [
+  { key: 'preoperatorio', label: 'Preoperatorio' },
+  { key: 'alta', label: 'Alta' },
+  { key: '1_mes', label: '1 mes' },
+  { key: '3_meses', label: '3 meses' },
+  { key: '6_meses', label: '6 meses' },
+  { key: '12_meses', label: '12 meses' },
+] as const;
+
+const evolucionProyecto = momentosProyecto.map(
+  (momento) => {
+    const valoresVAS = pacientesIncluidos
+      .map(
+        (patient) =>
+          patient.escalas[momento.key].vas
+      )
+      .filter(
+        (valor): valor is number =>
+          typeof valor === 'number'
+      );
+
+    const valoresODI = pacientesIncluidos
+      .map(
+        (patient) =>
+          patient.escalas[momento.key].odi
+      )
+      .filter(
+        (valor): valor is number =>
+          typeof valor === 'number'
+      );
+
+    const promedioVAS =
+      valoresVAS.length > 0
+        ? valoresVAS.reduce(
+            (suma, valor) => suma + valor,
+            0
+          ) / valoresVAS.length
+        : null;
+
+    const promedioODI =
+      valoresODI.length > 0
+        ? valoresODI.reduce(
+            (suma, valor) => suma + valor,
+            0
+          ) / valoresODI.length
+        : null;
+
+    return {
+      momento: momento.label,
+      vas: promedioVAS,
+      odi: promedioODI,
+      nVAS: valoresVAS.length,
+      nODI: valoresODI.length,
+    };
+  }
+);
+const datosVASProyecto = {
+  labels: evolucionProyecto.map(
+    (resultado) =>
+      `${resultado.momento} (n=${resultado.nVAS})`
+  ),
+  datasets: [
+    {
+      label: 'VAS promedio',
+      data: evolucionProyecto.map(
+        (resultado) => resultado.vas
+      ),
+      tension: 0.3,
+    },
+  ],
+};
+
+const datosODIProyecto = {
+  labels: evolucionProyecto.map(
+    (resultado) =>
+      `${resultado.momento} (n=${resultado.nODI})`
+  ),
+  datasets: [
+    {
+      label: 'ODI promedio',
+      data: evolucionProyecto.map(
+        (resultado) => resultado.odi
+      ),
+      tension: 0.3,
+    },
+  ],
+};
   const patientIdsValidos = project.patientIds.filter(
   (patientId) =>
     patients.some(
@@ -190,6 +355,182 @@ const ResearchProjectDetailPage: React.FC = () => {
         <IonCard>
           <IonCardHeader>
             <IonCardTitle>
+              <IonCard>
+  <IonCardHeader>
+    <IonCardTitle>
+      Resumen del proyecto
+    </IonCardTitle>
+  </IonCardHeader>
+
+  <IonCardContent>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns:
+          'repeat(auto-fit, minmax(160px, 1fr))',
+        gap: '12px',
+      }}
+    >
+      <div>
+        <strong>Pacientes incluidos</strong>
+        <h2>{pacientesIncluidos.length}</h2>
+      </div>
+
+      <div>
+        <strong>Edad promedio</strong>
+        <h2>
+          {edadPromedioProyecto !== '—'
+            ? `${edadPromedioProyecto} años`
+            : '—'}
+        </h2>
+      </div>
+
+      <div>
+        <strong>VAS preoperatorio promedio</strong>
+        <h2>{vasPreoperatorioPromedio}</h2>
+      </div>
+
+      <div>
+        <strong>ODI preoperatorio promedio</strong>
+        <h2>
+          {odiPreoperatorioPromedio !== '—'
+            ? `${odiPreoperatorioPromedio}%`
+            : '—'}
+        </h2>
+      </div>
+    </div>
+  </IonCardContent>
+</IonCard>
+<IonCard>
+  <IonCardHeader>
+    <IonCardTitle>
+      Evolución promedio del proyecto
+    </IonCardTitle>
+  </IonCardHeader>
+
+  <IonCardContent>
+    {evolucionProyecto.map((resultado) => (
+      <div
+        key={resultado.momento}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: '10px',
+          padding: '10px 0',
+          borderBottom: '1px solid #ddd',
+        }}
+      >
+        <strong>{resultado.momento}</strong>
+
+        <span>
+          VAS:{' '}
+          {resultado.vas !== null
+            ? resultado.vas.toFixed(1)
+            : '—'}
+          {resultado.nVAS > 0
+            ? ` (n=${resultado.nVAS})`
+            : ''}
+        </span>
+
+        <span>
+          ODI:{' '}
+          {resultado.odi !== null
+            ? `${resultado.odi.toFixed(1)}%`
+            : '—'}
+          {resultado.nODI > 0
+            ? ` (n=${resultado.nODI})`
+            : ''}
+        </span>
+      </div>
+    ))}
+  </IonCardContent>
+</IonCard>
+<IonCard>
+  <IonCardHeader>
+    <IonCardTitle>
+      Evolución VAS del proyecto
+    </IonCardTitle>
+  </IonCardHeader>
+
+  <IonCardContent>
+    <div
+      style={{
+        width: '100%',
+        height: '360px',
+      }}
+    >
+      <Line
+        data={datosVASProyecto}
+        options={{
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              min: 0,
+              max: 10,
+              ticks: {
+                stepSize: 1,
+              },
+              title: {
+                display: true,
+                text: 'VAS',
+              },
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Seguimiento',
+              },
+            },
+          },
+        }}
+      />
+    </div>
+  </IonCardContent>
+</IonCard>
+<IonCard>
+  <IonCardHeader>
+    <IonCardTitle>
+      Evolución ODI del proyecto
+    </IonCardTitle>
+  </IonCardHeader>
+
+  <IonCardContent>
+    <div
+      style={{
+        width: '100%',
+        height: '360px',
+      }}
+    >
+      <Line
+        data={datosODIProyecto}
+        options={{
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 10,
+              },
+              title: {
+                display: true,
+                text: 'ODI (%)',
+              },
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Seguimiento',
+              },
+            },
+          },
+        }}
+      />
+    </div>
+  </IonCardContent>
+</IonCard>
               Seleccionar pacientes
             </IonCardTitle>
           </IonCardHeader>
