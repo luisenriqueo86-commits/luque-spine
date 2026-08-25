@@ -178,3 +178,54 @@ export const updatePatientScales = (
     // no bloqueamos la eliminación del paciente.
   }
 };
+export const contarSeguimientosPendientes = (
+  patients: Patient[]
+): number => {
+  const hoy = new Date();
+
+  return patients.reduce((total, patient) => {
+    if (!patient.fechaCirugia) {
+      return total;
+    }
+
+    const fecha = new Date(
+      `${patient.fechaCirugia}T00:00:00`
+    );
+
+    if (Number.isNaN(fecha.getTime())) {
+      return total;
+    }
+
+    const meses =
+      (hoy.getFullYear() - fecha.getFullYear()) * 12 +
+      (hoy.getMonth() - fecha.getMonth());
+
+    const controles = [
+      { key: '1_mes', meses: 1 },
+      { key: '3_meses', meses: 3 },
+      { key: '6_meses', meses: 6 },
+      { key: '12_meses', meses: 12 },
+    ] as const;
+
+    const pendientesPaciente = controles.filter(
+      (control) => {
+        if (meses < control.meses) {
+          return false;
+        }
+
+        const escala =
+          patient.escalas[control.key];
+
+        const tieneVAS =
+          typeof escala?.vas === 'number';
+
+        const tieneODI =
+          typeof escala?.odi === 'number';
+
+        return !tieneVAS && !tieneODI;
+      }
+    ).length;
+
+    return total + pendientesPaciente;
+  }, 0);
+};

@@ -22,8 +22,10 @@ import {
 
 import { useHistory } from 'react-router-dom';
 import { useState } from 'react';
-
-import { getPatients } from '../services/patientStorage';
+ import {
+  getPatients,
+  contarSeguimientosPendientes,
+} from '../services/patientStorage';
 import { getResearchProjects } from '../services/researchProjectStorage';
 
 const HomePage: React.FC = () => {
@@ -37,6 +39,7 @@ const HomePage: React.FC = () => {
   useIonViewWillEnter(() => {
     const pacientes = getPatients();
     const proyectos = getResearchProjects();
+     
 
     setTotalPacientes(pacientes.length);
 
@@ -44,56 +47,8 @@ const HomePage: React.FC = () => {
       proyectos.filter((proyecto) => proyecto.activo).length
     );
 
-    const hoy = new Date();
-
-    const pendientes = pacientes.reduce(
-      (total, paciente) => {
-        if (!paciente.fechaCirugia) {
-          return total;
-        }
-
-        const fecha = new Date(
-          `${paciente.fechaCirugia}T00:00:00`
-        );
-
-        if (Number.isNaN(fecha.getTime())) {
-          return total;
-        }
-
-        const meses =
-          (hoy.getFullYear() - fecha.getFullYear()) * 12 +
-          (hoy.getMonth() - fecha.getMonth());
-
-        const controles = [
-          { key: '1_mes', meses: 1 },
-          { key: '3_meses', meses: 3 },
-          { key: '6_meses', meses: 6 },
-          { key: '12_meses', meses: 12 },
-        ] as const;
-
-        const pendientesPaciente = controles.filter(
-          (control) => {
-            if (meses < control.meses) {
-              return false;
-            }
-
-            const escala =
-              paciente.escalas[control.key];
-
-            const tieneVAS =
-              typeof escala?.vas === 'number';
-
-            const tieneODI =
-              typeof escala?.odi === 'number';
-
-            return !tieneVAS && !tieneODI;
-          }
-        ).length;
-
-        return total + pendientesPaciente;
-      },
-      0
-    );
+     const pendientes =
+  contarSeguimientosPendientes(pacientes);
 
     setSeguimientosPendientes(pendientes);
   });
