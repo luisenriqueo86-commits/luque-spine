@@ -1220,10 +1220,10 @@ const opcionesVAS = {
     margin: '0 auto 32px auto',
   }}
 >
-  <Line
-    data={datosODI}
-    options={opcionesODI}
-  />
+   <Line
+  data={datosODI}
+  options={opcionesGraficoODI}
+/>
 </div>
     </IonCardContent>
   </IonCard>
