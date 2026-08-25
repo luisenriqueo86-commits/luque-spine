@@ -173,8 +173,18 @@ const HomePage: React.FC = () => {
             </IonCardHeader>
 
             <IonCardContent>
-              <h1>{seguimientosPendientes}</h1>
-            </IonCardContent>
+  <h1>{seguimientosPendientes}</h1>
+
+  <strong>
+    {seguimientosPendientes === 0
+      ? '✓ Seguimiento al día'
+      : `⚠ ${seguimientosPendientes} ${
+          seguimientosPendientes === 1
+            ? 'control pendiente'
+            : 'controles pendientes'
+        }`}
+  </strong>
+</IonCardContent>
           </IonCard>
 
         </div>
