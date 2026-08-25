@@ -26,6 +26,7 @@ import { Patient } from '../models/patient';
 import { getPatients } from '../services/patientStorage';
 import { getResearchProjects } from '../services/researchProjectStorage';
 import { Line, Bar } from 'react-chartjs-2';
+import { useHistory } from 'react-router-dom';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -47,6 +48,7 @@ ChartJS.register(
 );
 
 const PatientStatisticsPage: React.FC = () => {
+  const history = useHistory();
  const [pacientes, setPacientes] = useState<Patient[]>(
   () => getPatients()
 );
@@ -298,7 +300,68 @@ const seguimientosPendientes = cumplimientoSeguimiento.map(
     ),
   })
 );
- 
+const totalSeguimientosPendientes =
+  seguimientosPendientes.reduce(
+    (suma, seguimiento) =>
+      suma + seguimiento.pendientes,
+    0
+  );
+ const pacientesConSeguimientosPendientes =
+  pacientesFiltrados.flatMap((paciente) => {
+    const meses = mesesDesdeCirugia(
+      paciente.fechaCirugia
+    );
+
+    if (meses === null) {
+      return [];
+    }
+
+    const controles = [
+      { key: '1_mes', nombre: '1 mes', meses: 1 },
+      { key: '3_meses', nombre: '3 meses', meses: 3 },
+      { key: '6_meses', nombre: '6 meses', meses: 6 },
+      { key: '12_meses', nombre: '12 meses', meses: 12 },
+    ] as const;
+
+    return controles
+      .filter((control) => {
+        if (meses < control.meses) {
+          return false;
+        }
+
+        const escala =
+          paciente.escalas[control.key];
+
+        const tieneVAS =
+          typeof escala?.vas === 'number';
+
+        const tieneODI =
+          typeof escala?.odi === 'number';
+
+        return !tieneVAS && !tieneODI;
+      })
+      .map((control) => ({
+        pacienteId: paciente.id,
+        pacienteNombre:
+          paciente.nombre || 'Sin nombre',
+        momento: control.nombre,
+      }));
+  });
+  const pacientesPendientesOrdenados = [
+  ...pacientesConSeguimientosPendientes,
+].sort((a, b) => {
+  const orden: Record<string, number> = {
+    '12 meses': 4,
+    '6 meses': 3,
+    '3 meses': 2,
+    '1 mes': 1,
+  };
+
+  return (
+    (orden[b.momento] || 0) -
+    (orden[a.momento] || 0)
+  );
+});
  const vasPreoperatorio = promediosSeguimiento[0]?.vas;
 
 const mejoriaVAS = promediosSeguimiento.map((resultado) => {
@@ -852,6 +915,122 @@ const opcionesODI = {
 
     </IonCard>
 
+  </IonCol>
+</IonRow>
+{/* SEGUIMIENTOS PENDIENTES */}
+
+<IonRow>
+  <IonCol size="12">
+    <IonCard>
+      <IonCardHeader>
+        <IonCardTitle>
+          Seguimientos pendientes
+        </IonCardTitle>
+      </IonCardHeader>
+
+      <IonCardContent>
+        <h2 style={{ marginTop: 0 }}>
+  Total pendientes: {totalSeguimientosPendientes}
+</h2>
+ {totalSeguimientosPendientes > 0 && (
+  <div
+     style={{
+  display: 'grid',
+  gridTemplateColumns: '2fr 1fr',
+  gap: '12px',
+  alignItems: 'center',
+  padding: '12px 0',
+  borderBottom: '1px solid #ddd',
+}}
+  >
+    <strong>
+      ⚠ Hay seguimientos pendientes
+    </strong>
+  </div>
+)}
+{totalSeguimientosPendientes > 0 && (
+  <p>
+    ⚠ Hay seguimientos pendientes
+  </p>
+)}
+        {seguimientosPendientes.map((resultado) => (
+          <div
+            key={resultado.momento}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '10px 0',
+              borderBottom: '1px solid #ddd',
+            }}
+          >
+            <strong>{resultado.momento}</strong>
+
+            <span>
+              {resultado.pendientes}{' '}
+              {resultado.pendientes === 1
+                ? 'paciente pendiente'
+                : 'pacientes pendientes'}
+            </span>
+          </div>
+        ))}
+        <hr style={{ margin: '20px 0' }} />
+
+<h3>Pacientes con controles pendientes</h3>
+
+{pacientesConSeguimientosPendientes.length === 0 ? (
+  <p>No hay pacientes con seguimientos pendientes.</p>
+) : (
+  pacientesPendientesOrdenados.map((item) => (
+    <div
+      key={`${item.pacienteId}-${item.momento}`}
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        padding: '10px 0',
+        borderBottom: '1px solid #ddd',
+      }}
+    >
+        <div>
+  <strong
+    style={{
+      cursor: 'pointer',
+      textDecoration: 'underline',
+    }}
+    onClick={() =>
+      history.push(`/pacientes/${item.pacienteId}`)
+    }
+  >
+    {item.pacienteNombre}
+  </strong>
+
+  <div
+    style={{
+      fontSize: '13px',
+      marginTop: '4px',
+      opacity: 0.7,
+    }}
+  >
+    Abrir ficha del paciente
+  </div>
+</div>
+
+      <span
+  style={{
+    fontWeight: 600,
+    padding: '6px 10px',
+    border: '1px solid #d97706',
+    borderRadius: '8px',
+    background: '#fff7ed',
+    textAlign: 'center',
+  }}
+>
+  Control: {item.momento}
+</span>
+    </div>
+  ))
+)}
+      </IonCardContent>
+    </IonCard>
   </IonCol>
 </IonRow>
 {/* GRÁFICOS VAS Y ODI */}
