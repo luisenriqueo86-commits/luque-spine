@@ -23,7 +23,10 @@ IonProgressBar,
 import { useIonViewWillEnter } from '@ionic/react';
 
 import { Patient } from '../models/patient';
-import { getPatients } from '../services/patientStorage';
+ import {
+  getPatients,
+  contarSeguimientosPendientes,
+} from '../services/patientStorage';
 import { getResearchProjects } from '../services/researchProjectStorage';
 import { Line, Bar } from 'react-chartjs-2';
 import { useHistory } from 'react-router-dom';
@@ -300,12 +303,8 @@ const seguimientosPendientes = cumplimientoSeguimiento.map(
     ),
   })
 );
-const totalSeguimientosPendientes =
-  seguimientosPendientes.reduce(
-    (suma, seguimiento) =>
-      suma + seguimiento.pendientes,
-    0
-  );
+ const totalSeguimientosPendientes =
+  contarSeguimientosPendientes(pacientesFiltrados);
  const pacientesConSeguimientosPendientes =
   pacientesFiltrados.flatMap((paciente) => {
     const meses = mesesDesdeCirugia(
