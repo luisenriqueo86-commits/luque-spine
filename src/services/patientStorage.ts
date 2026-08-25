@@ -229,3 +229,57 @@ export const contarSeguimientosPendientes = (
     return total + pendientesPaciente;
   }, 0);
 };
+export const obtenerSeguimientosPendientes = (
+  patients: Patient[]
+) => {
+  const hoy = new Date();
+
+  return patients.flatMap((patient) => {
+    if (!patient.fechaCirugia) {
+      return [];
+    }
+
+    const fecha = new Date(
+      `${patient.fechaCirugia}T00:00:00`
+    );
+
+    if (Number.isNaN(fecha.getTime())) {
+      return [];
+    }
+
+    const meses =
+      (hoy.getFullYear() - fecha.getFullYear()) * 12 +
+      (hoy.getMonth() - fecha.getMonth());
+
+    const controles = [
+      { key: '1_mes', nombre: '1 mes', meses: 1 },
+      { key: '3_meses', nombre: '3 meses', meses: 3 },
+      { key: '6_meses', nombre: '6 meses', meses: 6 },
+      { key: '12_meses', nombre: '12 meses', meses: 12 },
+    ] as const;
+
+    return controles
+      .filter((control) => {
+        if (meses < control.meses) {
+          return false;
+        }
+
+        const escala =
+          patient.escalas[control.key];
+
+        const tieneVAS =
+          typeof escala?.vas === 'number';
+
+        const tieneODI =
+          typeof escala?.odi === 'number';
+
+        return !tieneVAS && !tieneODI;
+      })
+      .map((control) => ({
+        pacienteId: patient.id,
+        pacienteNombre:
+          patient.nombre || 'Sin nombre',
+        momento: control.nombre,
+      }));
+  });
+};

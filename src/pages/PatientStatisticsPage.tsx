@@ -23,9 +23,10 @@ IonProgressBar,
 import { useIonViewWillEnter } from '@ionic/react';
 
 import { Patient } from '../models/patient';
- import {
+import {
   getPatients,
   contarSeguimientosPendientes,
+  obtenerSeguimientosPendientes,
 } from '../services/patientStorage';
 import { getResearchProjects } from '../services/researchProjectStorage';
 import { Line, Bar } from 'react-chartjs-2';
@@ -305,47 +306,10 @@ const seguimientosPendientes = cumplimientoSeguimiento.map(
 );
  const totalSeguimientosPendientes =
   contarSeguimientosPendientes(pacientesFiltrados);
- const pacientesConSeguimientosPendientes =
-  pacientesFiltrados.flatMap((paciente) => {
-    const meses = mesesDesdeCirugia(
-      paciente.fechaCirugia
-    );
-
-    if (meses === null) {
-      return [];
-    }
-
-    const controles = [
-      { key: '1_mes', nombre: '1 mes', meses: 1 },
-      { key: '3_meses', nombre: '3 meses', meses: 3 },
-      { key: '6_meses', nombre: '6 meses', meses: 6 },
-      { key: '12_meses', nombre: '12 meses', meses: 12 },
-    ] as const;
-
-    return controles
-      .filter((control) => {
-        if (meses < control.meses) {
-          return false;
-        }
-
-        const escala =
-          paciente.escalas[control.key];
-
-        const tieneVAS =
-          typeof escala?.vas === 'number';
-
-        const tieneODI =
-          typeof escala?.odi === 'number';
-
-        return !tieneVAS && !tieneODI;
-      })
-      .map((control) => ({
-        pacienteId: paciente.id,
-        pacienteNombre:
-          paciente.nombre || 'Sin nombre',
-        momento: control.nombre,
-      }));
-  });
+  const pacientesConSeguimientosPendientes =
+  obtenerSeguimientosPendientes(
+    pacientesFiltrados
+  );
   const pacientesPendientesOrdenados = [
   ...pacientesConSeguimientosPendientes,
 ].sort((a, b) => {
