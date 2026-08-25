@@ -285,6 +285,84 @@ const datosODIProyecto = {
       (patient) => patient.id === patientId
     )
 );
+const exportarCSVProyecto = () => {
+  if (!project) return;
+
+  const pacientesProyecto = patients.filter(
+    (patient) =>
+      project.patientIds.includes(patient.id)
+  );
+
+  const encabezados = [
+    'paciente_id',
+    'edad',
+    'sexo',
+    'diagnostico',
+    'vas_preoperatorio',
+    'odi_preoperatorio',
+    'vas_alta',
+    'odi_alta',
+    'vas_1_mes',
+    'odi_1_mes',
+    'vas_3_meses',
+    'odi_3_meses',
+    'vas_6_meses',
+    'odi_6_meses',
+    'vas_12_meses',
+    'odi_12_meses',
+  ];
+
+  const filas = pacientesProyecto.map((patient) => [
+    patient.id,
+    patient.edad ?? '',
+    patient.sexo ?? '',
+    patient.diagnostico ?? '',
+    patient.escalas.preoperatorio.vas ?? '',
+    patient.escalas.preoperatorio.odi ?? '',
+    patient.escalas.alta.vas ?? '',
+    patient.escalas.alta.odi ?? '',
+    patient.escalas['1_mes'].vas ?? '',
+    patient.escalas['1_mes'].odi ?? '',
+    patient.escalas['3_meses'].vas ?? '',
+    patient.escalas['3_meses'].odi ?? '',
+    patient.escalas['6_meses'].vas ?? '',
+    patient.escalas['6_meses'].odi ?? '',
+    patient.escalas['12_meses'].vas ?? '',
+    patient.escalas['12_meses'].odi ?? '',
+  ]);
+
+  const csv = [
+    encabezados.join(','),
+    ...filas.map((fila) =>
+      fila
+        .map((valor) => {
+          const texto = String(valor)
+            .replace(/"/g, '""');
+
+          return `"${texto}"`;
+        })
+        .join(',')
+    ),
+  ].join('\n');
+
+  const blob = new Blob(
+    [csv],
+    { type: 'text/csv;charset=utf-8;' }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const enlace = document.createElement('a');
+
+  enlace.href = url;
+
+  enlace.download =
+    `${project.nombre || 'proyecto'}-resultados.csv`;
+
+  enlace.click();
+
+  URL.revokeObjectURL(url);
+};
 
   return (
     <IonPage>
@@ -399,6 +477,13 @@ const datosODIProyecto = {
         </h2>
       </div>
     </div>
+    <IonButton
+  expand="block"
+  className="ion-margin-top"
+  onClick={exportarCSVProyecto}
+>
+  Exportar CSV del proyecto
+</IonButton>
   </IonCardContent>
 </IonCard>
 <IonCard>
