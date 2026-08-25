@@ -475,6 +475,18 @@ const opcionesODI = {
     },
   },
 };
+const convertirMomentoAKey = (
+  momento: string
+): string => {
+  const mapa: Record<string, string> = {
+    '1 mes': '1_mes',
+    '3 meses': '3_meses',
+    '6 meses': '6_meses',
+    '12 meses': '12_meses',
+  };
+
+  return mapa[momento] || 'preoperatorio';
+};
   return (
    <IonPage>
   <IonHeader>
@@ -959,9 +971,13 @@ const opcionesODI = {
       cursor: 'pointer',
       textDecoration: 'underline',
     }}
-    onClick={() =>
-      history.push(`/pacientes/${item.pacienteId}`)
-    }
+   onClick={() =>
+  history.push(
+    `/pacientes/${item.pacienteId}?seccion=seguimiento&momento=${convertirMomentoAKey(
+      item.momento
+    )}`
+  )
+}
   >
     {item.pacienteNombre}
   </strong>

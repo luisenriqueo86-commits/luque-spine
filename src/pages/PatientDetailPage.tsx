@@ -25,7 +25,10 @@
 } from '@ionic/react';
 
  import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+ import {
+  useParams,
+  useLocation,
+} from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import {
   Chart as ChartJS,
@@ -98,12 +101,28 @@ const PatientDetailPage: React.FC = () => {
   'Vida social',
   'Viajar',];
   const { id } = useParams<RouteParams>();
+  const location = useLocation();
 
   const [paciente, setPaciente] =
     useState<Patient | null>(null);
 
   const [seccion, setSeccion] =
     useState<PatientSection>('datos');
+    useIonViewWillEnter(() => {
+  const params = new URLSearchParams(location.search);
+
+  const seccionURL = params.get('seccion');
+
+  if (
+    seccionURL === 'datos' ||
+    seccionURL === 'diagnostico' ||
+    seccionURL === 'cirugia' ||
+    seccionURL === 'escalas' ||
+    seccionURL === 'seguimiento'
+  ) {
+    setSeccion(seccionURL);
+  }
+});
 
   const [escalas, setEscalas] =
     useState<PatientScales | null>(null);
@@ -116,6 +135,22 @@ const [mostrarEliminar, setMostrarEliminar] =
 
 const [momentoODI, setMomentoODI] =
   useState<FollowUpMoment>('preoperatorio');
+  useIonViewWillEnter(() => {
+  const params = new URLSearchParams(location.search);
+
+  const momentoURL = params.get('momento');
+
+  if (
+    momentoURL === 'preoperatorio' ||
+    momentoURL === 'alta' ||
+    momentoURL === '1_mes' ||
+    momentoURL === '3_meses' ||
+    momentoURL === '6_meses' ||
+    momentoURL === '12_meses'
+  ) {
+    setMomentoODI(momentoURL);
+  }
+});
 
      useIonViewWillEnter(() => {
   const encontrado = getPatients().find(
