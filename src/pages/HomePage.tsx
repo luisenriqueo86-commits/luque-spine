@@ -162,7 +162,10 @@ const HomePage: React.FC = () => {
             </IonCardContent>
           </IonCard>
 
-          <IonCard>
+          <IonCard
+  button
+  onClick={() => history.push('/estadisticas')}
+>
             <IonCardHeader>
               <IonCardTitle>
                 Seguimientos pendientes
@@ -191,7 +194,10 @@ const HomePage: React.FC = () => {
           </IonCardContent>
         </IonCard>
 
-        <IonCard>
+         <IonCard
+  button
+  onClick={() => history.push('/estadisticas')}
+>
           <IonCardHeader>
             <IonCardTitle>
               <IonIcon icon={documentTextOutline} /> Seguimientos
