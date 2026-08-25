@@ -349,42 +349,104 @@ const PatientsPage: React.FC = () => {
     gap: '6px',
   }}
 >
-  {[
-    ['Preop', paciente.escalas.preoperatorio],
-    ['Alta', paciente.escalas.alta],
-    ['1 mes', paciente.escalas['1_mes']],
-    ['3 meses', paciente.escalas['3_meses']],
-    ['6 meses', paciente.escalas['6_meses']],
-    ['12 meses', paciente.escalas['12_meses']],
-  ].map(([label, resultado]) => {
+   {(() => {
+  const pendientesActuales =
+    obtenerSeguimientosPendientes([paciente]);
+
+  const momentosPendientes = new Set(
+    pendientesActuales.map(
+      (pendiente) => pendiente.momento
+    )
+  );
+
+  const controles = [
+    {
+      label: 'Preop',
+      momento: 'Preoperatorio',
+      resultado: paciente.escalas.preoperatorio,
+      seguimiento: false,
+    },
+    {
+      label: 'Alta',
+      momento: 'Alta',
+      resultado: paciente.escalas.alta,
+      seguimiento: false,
+    },
+    {
+      label: '1 mes',
+      momento: '1 mes',
+      resultado: paciente.escalas['1_mes'],
+      seguimiento: true,
+    },
+    {
+      label: '3 meses',
+      momento: '3 meses',
+      resultado: paciente.escalas['3_meses'],
+      seguimiento: true,
+    },
+    {
+      label: '6 meses',
+      momento: '6 meses',
+      resultado: paciente.escalas['6_meses'],
+      seguimiento: true,
+    },
+    {
+      label: '12 meses',
+      momento: '12 meses',
+      resultado: paciente.escalas['12_meses'],
+      seguimiento: true,
+    },
+  ];
+
+  return controles.map((control) => {
     const completo =
-      resultado.vas !== null ||
-      resultado.odi !== null;
+      control.resultado.vas !== null ||
+      control.resultado.odi !== null;
+
+    const pendiente =
+      control.seguimiento &&
+      momentosPendientes.has(control.momento);
+
+    const textoEstado = completo
+      ? '✓'
+      : control.seguimiento
+        ? pendiente
+          ? '⚠ Pendiente'
+          : 'Aún no corresponde'
+        : 'Sin cargar';
 
     return (
       <span
-        key={label}
+        key={control.label}
         style={{
           padding: '4px 8px',
           borderRadius: '12px',
           fontSize: '12px',
-         border: completo
-  ? '1px solid var(--ion-color-success)'
-  : '1px solid var(--ion-color-medium)',
 
-color: completo
-  ? 'var(--ion-color-success)'
-  : 'var(--ion-color-medium)',
+          border: completo
+            ? '1px solid var(--ion-color-success)'
+            : pendiente
+              ? '1px solid var(--ion-color-warning)'
+              : '1px solid var(--ion-color-medium)',
 
-background: completo
-  ? 'rgba(var(--ion-color-success-rgb), 0.10)'
-  : 'rgba(var(--ion-color-medium-rgb), 0.10)',
+          color: completo
+            ? 'var(--ion-color-success)'
+            : pendiente
+              ? 'var(--ion-color-warning)'
+              : 'var(--ion-color-medium)',
+
+          background: completo
+            ? 'rgba(var(--ion-color-success-rgb), 0.10)'
+            : pendiente
+              ? 'rgba(var(--ion-color-warning-rgb), 0.10)'
+              : 'rgba(var(--ion-color-medium-rgb), 0.10)',
         }}
       >
-        {label} {completo ? '✓' : 'Pendiente'}
+        {control.label} {textoEstado}
       </span>
     );
-  })}
+  });
+})()}
 </div>
  {(() => {
   const pendientesPaciente =
