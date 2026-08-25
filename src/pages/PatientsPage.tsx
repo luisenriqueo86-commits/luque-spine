@@ -34,7 +34,10 @@ import {
 
 import { ResearchProject } from '../models/researchProject';
 
-import { getPatients } from '../services/patientStorage';
+ import {
+  getPatients,
+  obtenerSeguimientosPendientes,
+} from '../services/patientStorage';
 import { getResearchProjects } from '../services/researchProjectStorage';
 
 type FiltroSexo =
@@ -97,18 +100,8 @@ const PatientsPage: React.FC = () => {
           proyecto.patientIds.includes(paciente.id)
       );
 
-    const tienePendientes = [
-      paciente.escalas.preoperatorio,
-      paciente.escalas.alta,
-      paciente.escalas['1_mes'],
-      paciente.escalas['3_meses'],
-      paciente.escalas['6_meses'],
-      paciente.escalas['12_meses'],
-    ].some(
-      (resultado) =>
-        resultado.vas === null &&
-        resultado.odi === null
-    );
+     const tienePendientes =
+  obtenerSeguimientosPendientes([paciente]).length > 0;
 
     const coincidePendientes =
       !soloPendientes || tienePendientes;
