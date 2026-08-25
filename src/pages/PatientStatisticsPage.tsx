@@ -956,24 +956,34 @@ const convertirMomentoAKey = (
   <p>No hay pacientes con seguimientos pendientes.</p>
 ) : (
   pacientesPendientesOrdenados.map((item) => (
-    <div
-      key={`${item.pacienteId}-${item.momento}`}
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '10px 0',
-        borderBottom: '1px solid #ddd',
-      }}
-    >
+     <div
+  key={`${item.pacienteId}-${item.momento}`}
+  onClick={() =>
+    history.push(
+      `/pacientes/${item.pacienteId}?seccion=escalas&momento=${convertirMomentoAKey(
+        item.momento
+      )}`
+    )
+  }
+  style={{
+    display: 'grid',
+    gridTemplateColumns: '2fr 1fr',
+    gap: '12px',
+    alignItems: 'center',
+    padding: '12px 0',
+    borderBottom: '1px solid #ddd',
+    cursor: 'pointer',
+  }}
+>
         <div>
   <strong
     style={{
       cursor: 'pointer',
       textDecoration: 'underline',
     }}
-   onClick={() =>
+  onClick={() =>
   history.push(
-    `/pacientes/${item.pacienteId}?seccion=seguimiento&momento=${convertirMomentoAKey(
+    `/pacientes/${item.pacienteId}?seccion=escalas&momento=${convertirMomentoAKey(
       item.momento
     )}`
   )

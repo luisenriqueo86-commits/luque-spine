@@ -24,7 +24,7 @@
   useIonViewWillEnter,
 } from '@ionic/react';
 
- import { useState } from 'react';
+  import { useEffect, useState } from 'react';
  import {
   useParams,
   useLocation,
@@ -108,21 +108,7 @@ const PatientDetailPage: React.FC = () => {
 
   const [seccion, setSeccion] =
     useState<PatientSection>('datos');
-    useIonViewWillEnter(() => {
-  const params = new URLSearchParams(location.search);
-
-  const seccionURL = params.get('seccion');
-
-  if (
-    seccionURL === 'datos' ||
-    seccionURL === 'diagnostico' ||
-    seccionURL === 'cirugia' ||
-    seccionURL === 'escalas' ||
-    seccionURL === 'seguimiento'
-  ) {
-    setSeccion(seccionURL);
-  }
-});
+    
 
   const [escalas, setEscalas] =
     useState<PatientScales | null>(null);
@@ -135,10 +121,23 @@ const [mostrarEliminar, setMostrarEliminar] =
 
 const [momentoODI, setMomentoODI] =
   useState<FollowUpMoment>('preoperatorio');
-  useIonViewWillEnter(() => {
-  const params = new URLSearchParams(location.search);
+  useEffect(() => {
+  const params = new URLSearchParams(
+    location.search
+  );
 
+  const seccionURL = params.get('seccion');
   const momentoURL = params.get('momento');
+
+  if (
+    seccionURL === 'datos' ||
+    seccionURL === 'diagnostico' ||
+    seccionURL === 'cirugia' ||
+    seccionURL === 'escalas' ||
+    seccionURL === 'seguimiento'
+  ) {
+    setSeccion(seccionURL);
+  }
 
   if (
     momentoURL === 'preoperatorio' ||
@@ -150,7 +149,8 @@ const [momentoODI, setMomentoODI] =
   ) {
     setMomentoODI(momentoURL);
   }
-});
+}, [location.search]);
+   
 
      useIonViewWillEnter(() => {
   const encontrado = getPatients().find(
