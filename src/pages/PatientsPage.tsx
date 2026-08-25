@@ -396,7 +396,7 @@ const PatientsPage: React.FC = () => {
       resultado: paciente.escalas['12_meses'],
       seguimiento: true,
     },
-  ];
+  ] as const;
 
   return controles.map((control) => {
     const completo =
