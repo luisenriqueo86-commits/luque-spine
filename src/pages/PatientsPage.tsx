@@ -386,28 +386,19 @@ background: completo
     );
   })}
 </div>
-{(() => {
-  const controles = [
-    ['Preoperatorio', paciente.escalas.preoperatorio],
-    ['Alta', paciente.escalas.alta],
-    ['1 mes', paciente.escalas['1_mes']],
-    ['3 meses', paciente.escalas['3_meses']],
-    ['6 meses', paciente.escalas['6_meses']],
-    ['12 meses', paciente.escalas['12_meses']],
-  ] as const;
+ {(() => {
+  const pendientesPaciente =
+    obtenerSeguimientosPendientes([paciente]);
 
-  const proximoPendiente = controles.find(
-    ([, resultado]) =>
-      resultado.vas === null &&
-      resultado.odi === null
-  );
+  const proximoPendiente =
+    pendientesPaciente[0];
 
   return (
     <p style={{ marginTop: '8px' }}>
-      <strong>Próximo control pendiente:</strong>{' '}
+      <strong>Control pendiente actual:</strong>{' '}
       {proximoPendiente
-        ? proximoPendiente[0]
-        : 'Seguimiento completo'}
+        ? proximoPendiente.momento
+        : 'Seguimiento al día'}
     </p>
   );
 })()}
