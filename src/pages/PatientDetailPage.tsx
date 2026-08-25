@@ -100,6 +100,97 @@ const PatientDetailPage: React.FC = () => {
   'Vida sexual',
   'Vida social',
   'Viajar',];
+  const opcionesODI = [
+  [
+    'Puedo tolerar el dolor sin necesidad de tomar analgésicos.',
+    'El dolor es fuerte, pero aún así me arreglo sin tomar analgésico.',
+    'Los analgésicos me alivian completamente el dolor.',
+    'Los analgésicos me alivian un poco el dolor.',
+    'Los analgésicos apenas me alivian el dolor.',
+    'Los analgésicos no me quitan el dolor y no los tomo.',
+  ],
+
+  [
+    'Me puedo ocupar de mí mismo normalmente, sin causar aumento del dolor.',
+    'Me puedo ocupar de mí mismo normalmente, pero esto me aumenta el dolor.',
+    'Lavarme, vestirme, etc. me produce dolor y tengo que hacerlo despacio y con cuidado.',
+    'Necesito alguna ayuda, pero en general me valgo por mí mismo.',
+    'Necesito ayuda para hacer la mayoría de las cosas.',
+    'No me puedo vestir solo, me lavo con dificultad y suelo quedarme en la cama.',
+  ],
+
+  [
+    'Puedo levantar objetos pesados sin aumento del dolor.',
+    'Puedo levantar objetos pesados, pero aumenta el dolor.',
+    'El dolor me impide levantar objetos pesados desde el suelo, pero puedo hacerlo si están en un sitio cómodo.',
+    'El dolor me impide levantar objetos pesados, pero sí puedo levantar objetos ligeros o medianos si están en un sitio cómodo.',
+    'Sólo puedo levantar pesos muy livianos.',
+    'No puedo levantar ni llevar ningún objeto.',
+  ],
+
+  [
+    'El dolor no me impide caminar.',
+    'El dolor me impide caminar más de un kilómetro.',
+    'El dolor me impide caminar más de 500 metros.',
+    'El dolor me impide caminar más de 250 metros.',
+    'Sólo puedo caminar con bastón o muletas.',
+    'Estoy en cama casi todo el tiempo y debo arrastrarme para ir al baño.',
+  ],
+
+  [
+    'Puedo sentarme el tiempo que quiera en cualquier tipo de asiento.',
+    'Puedo sentarme el tiempo que quiera, solo en mi silla favorita.',
+    'El dolor me impide estar sentado por más de una hora.',
+    'El dolor me impide estar sentado por más de media hora.',
+    'El dolor me impide estar sentado por más de diez minutos.',
+    'El dolor me impide estar sentado.',
+  ],
+
+  [
+    'Puedo permanecer parado tanto tiempo como quiera sin aumento del dolor.',
+    'Puedo permanecer parado tanto tiempo como quiera pero aumenta el dolor.',
+    'El dolor me impide estar de pie por más de una hora.',
+    'El dolor me impide estar de pie por más de media hora.',
+    'El dolor me impide estar de pie por más de diez minutos.',
+    'El dolor me impide en absoluto estar de pie.',
+  ],
+
+  [
+    'El dolor no me impide dormir bien.',
+    'Sólo puedo dormir bien tomando pastillas.',
+    'Incluso tomando pastillas duermo menos de seis horas.',
+    'Incluso tomando pastillas duermo menos de cuatro horas.',
+    'Incluso tomando pastillas duermo menos de dos horas.',
+    'El dolor me impide totalmente dormir.',
+  ],
+
+  [
+    'Mi actividad sexual es normal y no me causa dolor.',
+    'Mi actividad sexual es normal pero me aumenta el dolor.',
+    'Mi actividad sexual es casi normal pero muy dolorosa.',
+    'Mi actividad sexual se ha visto muy limitada a causa del dolor.',
+    'Mi actividad sexual es prácticamente nula por dolor.',
+    'El dolor me impide todo tipo de actividad sexual.',
+  ],
+
+  [
+    'Mi vida social es normal y no me causa dolor.',
+    'Mi vida social es normal pero aumenta la intensidad del dolor.',
+    'El dolor no tiene ninguna consecuencia en mi vida social, aparte de limitar mis inclinaciones por las actividades físicas más activas.',
+    'El dolor ha restringido mi vida social, y no salgo tan a menudo.',
+    'El dolor ha restringido mi vida social a mi casa.',
+    'No tengo vida social a causa del dolor.',
+  ],
+
+  [
+    'Puedo viajar a cualquier sitio sin aumento del dolor.',
+    'Puedo viajar a cualquier sitio pero aumenta el dolor.',
+    'El dolor es intenso pero realizo viajes de más de dos horas.',
+    'El dolor me limita a viajes de menos de una hora.',
+    'El dolor me limita a viajes cortos y necesarios de menos de media hora.',
+    'El dolor me impide todo viaje excepto ir al médico o al hospital.',
+  ],
+];
   const { id } = useParams<RouteParams>();
   const location = useLocation();
 
@@ -587,7 +678,7 @@ const opcionesVAS = {
   },
 };
 
-const opcionesODI = {
+   const opcionesGraficoODI = {
   responsive: true,
   scales: {
     y: {
@@ -1028,29 +1119,16 @@ const opcionesODI = {
               )
             }
           >
-            <IonSelectOption value={0}>
-              0
-            </IonSelectOption>
-
-            <IonSelectOption value={1}>
-              1
-            </IonSelectOption>
-
-            <IonSelectOption value={2}>
-              2
-            </IonSelectOption>
-
-            <IonSelectOption value={3}>
-              3
-            </IonSelectOption>
-
-            <IonSelectOption value={4}>
-              4
-            </IonSelectOption>
-
-            <IonSelectOption value={5}>
-              5
-            </IonSelectOption>
+            {opcionesODI[indice].map(
+  (texto, puntuacion) => (
+    <IonSelectOption
+      key={puntuacion}
+      value={puntuacion}
+    >
+      {puntuacion} — {texto}
+    </IonSelectOption>
+  )
+)}
           </IonSelect>
         </IonItem>
       ))}
